@@ -45,5 +45,8 @@ export default defineConfig(({ mode, command }) => {
         },
       },
     },
+    preview: {
+      allowedHosts: ['all'],
+    },
   };
 });
