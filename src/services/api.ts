@@ -1,4 +1,5 @@
 import axios from "axios";
+import { apiBase } from "@/config/apiBase";
 
 /** Must match `AUTH_STORAGE_KEY` in `App.tsx`. */
 const AUTH_STORAGE_KEY = "auth_state";
@@ -18,11 +19,6 @@ function readStoredAuth(): { user?: unknown; accessToken?: string; refreshToken?
     return null;
   }
 }
-
-const apiBase =
-  typeof import.meta.env.VITE_API_BASE_URL === "string" && import.meta.env.VITE_API_BASE_URL.length > 0
-    ? import.meta.env.VITE_API_BASE_URL
-    : "/api";
 
 function authRefreshUrl(): string {
   const base = apiBase.endsWith("/") ? apiBase.slice(0, -1) : apiBase;
