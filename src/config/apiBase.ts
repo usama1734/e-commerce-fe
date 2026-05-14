@@ -2,7 +2,8 @@
  * Axios base URL for the Express API.
  *
  * Value is set at **build time** in `vite.config.js` (`__APP_API_BASE__`) from, in order:
- * `VITE_API_BASE_URL`, `VITE_BACKEND_URL`, `BACKEND_URL`, `BACKEND_PUBLIC_URL`, then `.env` files.
+ * `VITE_API_BASE_URL`, `VITE_BACKEND_URL`, `BACKEND_URL`, `BACKEND_PUBLIC_URL`,
+ * `VITE_API_URL`, `API_URL` — then the same keys from `.env*` via `loadEnv`.
  *
  * - Local dev: usually `/api` (Vite proxies to `VITE_API_PROXY_TARGET`).
  * - Vercel: set one of the vars above to your backend (https://…). Redeploy after changing env.

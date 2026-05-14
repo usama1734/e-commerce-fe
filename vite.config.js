@@ -15,13 +15,13 @@ export default defineConfig(({ mode, command }) => {
   const publicApiBase = resolvePublicApiBase(env);
 
   if (command === 'build' && mode === 'production' && process.env.VERCEL === '1') {
-    const ok = publicApiBase && !publicApiBase.startsWith('/') && /^https:\/\//i.test(publicApiBase);
+    const ok =
+      publicApiBase && !publicApiBase.startsWith('/') && /^https:\/\//i.test(publicApiBase);
     if (!ok) {
-      // eslint-disable-next-line no-console
       console.warn(
         '\n[Vite] Vercel production build: set an absolute API URL so the app does not call itself.\n' +
-          '        Use one of (then redeploy): VITE_API_BASE_URL, VITE_BACKEND_URL, BACKEND_URL, BACKEND_PUBLIC_URL\n' +
-          '        Example: https://your-api.up.railway.app or https://your-api.up.railway.app/api\n'
+          '        Use one of (then redeploy): VITE_API_BASE_URL, VITE_BACKEND_URL, BACKEND_URL, BACKEND_PUBLIC_URL, VITE_API_URL, API_URL\n' +
+          '        Example: https://your-api.up.railway.app or https://your-api.up.railway.app/api\n',
       );
     }
   }
@@ -38,12 +38,18 @@ export default defineConfig(({ mode, command }) => {
       },
     },
     server: {
+      host: true,
+      allowedHosts: true,
       proxy: {
         '/api': {
           target: proxyTarget,
           changeOrigin: true,
         },
       },
+    },
+    preview: {
+      host: true,
+      allowedHosts: true,
     },
   };
 });
