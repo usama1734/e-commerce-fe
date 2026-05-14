@@ -15,7 +15,7 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api': 'http://localhost:4000',
+      '/api': 'https://e-commerce-be-production-0a7a.up.railway.app',
     },
   },
 });
