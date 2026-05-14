@@ -21,25 +21,9 @@ export const initialFilters: Filters = {
   q: "",
   brand: "",
   category: "",
-  collection: "",
   color: "",
   size: "",
   minPrice: "",
   maxPrice: "",
   sortBy: "featured",
 };
-
-export const COLLECTION_SHOWCASE = [
-  {
-    title: "Summer Lawn 26",
-    subtitle: "Breathable fabrics with elegant cuts for everyday luxury.",
-  },
-  {
-    title: "Luxury Pret",
-    subtitle: "Premium festive silhouettes crafted for modern style.",
-  },
-  {
-    title: "Ready to Wear",
-    subtitle: "Shop curated essentials with timeless and polished tones.",
-  },
-];

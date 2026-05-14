@@ -112,7 +112,7 @@ export function CartDetails({
                   </Text>
                 </Box>
               </HStack>
-              <HStack wrap="wrap" justify={{ base: "flex-start", md: "flex-end" }}>
+              <HStack wrap="wrap" justify={{ base: "flex-start", md: "flex-end" }} align="flex-end">
                 <Button size="sm" variant="outline" onClick={() => onDecrease(item)}>
                   -
                 </Button>
@@ -125,9 +125,17 @@ export function CartDetails({
                 <Button size="sm" variant="outline" onClick={() => onRemove(item.product.id)}>
                   Remove
                 </Button>
-                <Text minW="95px" textAlign="right" fontWeight="700">
-                  PKR {(item.product.pricePkr * item.quantity).toLocaleString()}
-                </Text>
+                <VStack align="flex-end" spacing={0}>
+                  {item.product.compareAtPricePkr != null &&
+                  item.product.compareAtPricePkr > item.product.pricePkr ? (
+                    <Text fontSize="xs" color="gray.400" textDecoration="line-through">
+                      PKR {(item.product.compareAtPricePkr * item.quantity).toLocaleString()}
+                    </Text>
+                  ) : null}
+                  <Text minW="95px" textAlign="right" fontWeight="700">
+                    PKR {(item.product.pricePkr * item.quantity).toLocaleString()}
+                  </Text>
+                </VStack>
               </HStack>
             </Flex>
           ))}

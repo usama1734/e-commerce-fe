@@ -6,9 +6,11 @@ export type Product = {
   description: string;
   imageUrl: string;
   pricePkr: number;
+  /** Optional list / compare-at price when greater than {@link Product.pricePkr} (sale). */
+  compareAtPricePkr?: number | null;
+  discountPercent?: number;
   brand: string;
   category: string;
-  collection?: string;
   color: string;
   size: string;
 };
@@ -48,12 +50,11 @@ export type Filters = {
   q: string;
   brand: string;
   category: string;
-  collection: string;
   color: string;
   size: string;
   minPrice: string;
   maxPrice: string;
-  sortBy: "featured" | "price_low" | "price_high" | "newest";
+  sortBy: "featured" | "price_low" | "price_high" | "newest" | "most_sold" | "biggest_discount";
 };
 
 export type HeroSlide = {

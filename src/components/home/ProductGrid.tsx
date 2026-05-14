@@ -51,8 +51,25 @@ export function ProductGrid({ loading, itemsPerPage, products, addedMap, onAddTo
                   {product.brand} | {product.category} | {product.color} | {product.size}
                 </Text>
                 <Text mt="2" fontWeight="700">
-                  PKR {product.pricePkr.toLocaleString()}
+                  {product.compareAtPricePkr != null &&
+                  product.compareAtPricePkr > product.pricePkr ? (
+                    <>
+                      <Text as="span" textDecoration="line-through" color="gray.400" fontWeight="500" mr={2}>
+                        PKR {product.compareAtPricePkr.toLocaleString()}
+                      </Text>
+                      <Text as="span" color="purple.600">
+                        PKR {product.pricePkr.toLocaleString()}
+                      </Text>
+                    </>
+                  ) : (
+                    <>PKR {product.pricePkr.toLocaleString()}</>
+                  )}
                 </Text>
+                {product.discountPercent != null && product.discountPercent > 0 ? (
+                  <Badge colorScheme="green" borderRadius="full" w="fit-content">
+                    {product.discountPercent}% off
+                  </Badge>
+                ) : null}
                 <HStack mt="auto" justify="space-between" align="center">
                   <Button size="sm" minW="116px" onClick={() => onAddToCart(product)}>
                     {addedMap[product.id] ? "Added" : "Add to Cart"}

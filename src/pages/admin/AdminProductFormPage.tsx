@@ -31,6 +31,8 @@ type VariantForm = {
   color: string;
   size: string;
   pricePkr: number;
+  compareAtPricePkr: number | "";
+  stripCompareAt?: boolean;
   stock: number;
 };
 
@@ -38,6 +40,8 @@ const emptyVariant = (): VariantForm => ({
   color: "",
   size: "",
   pricePkr: 0,
+  compareAtPricePkr: "",
+  stripCompareAt: false,
   stock: 0,
 });
 
@@ -49,7 +53,15 @@ type LoadedProduct = {
   brand: string;
   category: string;
   collection: string | null;
-  variants: Array<{ id: number; color: string; size: string; pricePkr: number; stock: number; sku: string }>;
+  variants: Array<{
+    id: number;
+    color: string;
+    size: string;
+    pricePkr: number;
+    compareAtPricePkr?: number | null;
+    stock: number;
+    sku: string;
+  }>;
 };
 
 export function AdminProductFormPage() {
@@ -129,6 +141,8 @@ export function AdminProductFormPage() {
                 color: v.color,
                 size: v.size,
                 pricePkr: v.pricePkr,
+                compareAtPricePkr: v.compareAtPricePkr ?? "",
+                stripCompareAt: false,
                 stock: v.stock,
               }))
             : [emptyVariant()]
@@ -190,13 +204,20 @@ export function AdminProductFormPage() {
           patch.removeVariantIds = removedVariantIds;
         }
         if (withId.length) {
-          patch.updateVariants = withId.map((v) => ({
-            id: v.id,
-            color: v.color.trim(),
-            size: v.size.trim(),
-            pricePkr: Number(v.pricePkr),
-            stock: Number(v.stock),
-          }));
+          patch.updateVariants = withId.map((v) => {
+            const row: Record<string, unknown> = {
+              id: v.id,
+              color: v.color.trim(),
+              size: v.size.trim(),
+              pricePkr: Number(v.pricePkr),
+              stock: Number(v.stock),
+            };
+            if (v.stripCompareAt) row.compareAtPricePkr = null;
+            else if (v.compareAtPricePkr !== "" && v.compareAtPricePkr != null) {
+              row.compareAtPricePkr = Number(v.compareAtPricePkr);
+            }
+            return row;
+          });
         }
         const newOnes = withoutId.filter((v) => v.color.trim() && v.size.trim());
         if (newOnes.length) {
@@ -205,6 +226,9 @@ export function AdminProductFormPage() {
             size: v.size.trim(),
             pricePkr: Number(v.pricePkr),
             stock: Number(v.stock),
+            ...(v.compareAtPricePkr !== "" && v.compareAtPricePkr != null
+              ? { compareAtPricePkr: Number(v.compareAtPricePkr) }
+              : {}),
           }));
         }
         await api.patch(`/admin/products/${productId}`, patch, {
@@ -227,6 +251,9 @@ export function AdminProductFormPage() {
               size: v.size,
               pricePkr: Number(v.pricePkr),
               stock: Number(v.stock),
+              ...(v.compareAtPricePkr !== "" && v.compareAtPricePkr != null
+                ? { compareAtPricePkr: Number(v.compareAtPricePkr) }
+                : {}),
             })),
           },
           { headers: { Authorization: `Bearer ${accessToken}` } }
@@ -373,7 +400,7 @@ export function AdminProductFormPage() {
                   isDisabled={variants.length <= 1}
                 />
               </HStack>
-              <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} spacing={4}>
+              <SimpleGrid columns={{ base: 1, sm: 2, md: 5 }} spacing={4}>
                 <FormControl isRequired>
                   <FormLabel fontSize="xs">Color</FormLabel>
                   <Input value={v.color} onChange={(e) => updateVariant(index, { color: e.target.value })} />
@@ -383,13 +410,28 @@ export function AdminProductFormPage() {
                   <Input value={v.size} onChange={(e) => updateVariant(index, { size: e.target.value })} />
                 </FormControl>
                 <FormControl isRequired>
-                  <FormLabel fontSize="xs">Price (PKR)</FormLabel>
+                  <FormLabel fontSize="xs">Sale price (PKR)</FormLabel>
                   <NumberInput
                     min={0}
                     value={v.pricePkr}
                     onChange={(_, n) => updateVariant(index, { pricePkr: Number.isNaN(n) ? 0 : n })}
                   >
                     <NumberInputField />
+                  </NumberInput>
+                </FormControl>
+                <FormControl>
+                  <FormLabel fontSize="xs">List / compare-at (PKR)</FormLabel>
+                  <NumberInput
+                    min={0}
+                    value={v.compareAtPricePkr === "" ? "" : v.compareAtPricePkr}
+                    onChange={(_, n) =>
+                      updateVariant(index, {
+                        compareAtPricePkr: Number.isNaN(n) ? "" : n,
+                        stripCompareAt: false,
+                      })
+                    }
+                  >
+                    <NumberInputField placeholder="Optional — shows discount badge" />
                   </NumberInput>
                 </FormControl>
                 <FormControl isRequired>
@@ -403,6 +445,23 @@ export function AdminProductFormPage() {
                   </NumberInput>
                 </FormControl>
               </SimpleGrid>
+              {v.id != null ? (
+                <Button
+                  type="button"
+                  mt={2}
+                  size="xs"
+                  variant="link"
+                  colorScheme="red"
+                  onClick={() =>
+                    updateVariant(index, {
+                      stripCompareAt: true,
+                      compareAtPricePkr: "",
+                    })
+                  }
+                >
+                  Remove list price (clear discount display)
+                </Button>
+              ) : null}
             </Box>
           ))}
         </VStack>

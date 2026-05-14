@@ -1,7 +1,7 @@
 import { createContext, useContext } from "react";
 
 export type CatalogRefreshContextValue = {
-  /** Refetch storefront product list + facet meta (home, collections, cart prices when listed). */
+  /** Refetch storefront product list + facet meta after catalog changes (home, cart prices when listed). */
   refreshStorefrontCatalog: () => Promise<void>;
 };
 

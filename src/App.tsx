@@ -9,7 +9,6 @@ import { HERO_SLIDES, initialFilters } from "@/constants/ui";
 import { calculateCartPricing } from "@/utils/cart";
 import { api, AUTH_SESSION_EXPIRED_EVENT, AUTH_TOKENS_REFRESHED_EVENT } from "@/services/api";
 import type { AuthState, CartItem, Product, Filters, CheckoutDetails, AddedMap } from "@/types";
-import { CollectionsPage } from "@/pages/CollectionsPage";
 import { CheckoutPage } from "@/pages/CheckoutPage";
 import { OrderConfirmationPage } from "@/pages/OrderConfirmationPage";
 import { OrdersPage } from "@/pages/OrdersPage";
@@ -63,7 +62,6 @@ function App() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [brands, setBrands] = useState<string[]>([]);
-  const [collections, setCollections] = useState<string[]>([]);
   const [colors, setColors] = useState<string[]>([]);
   const [sizes, setSizes] = useState<string[]>([]);
   const [activeSlide, setActiveSlide] = useState(0);
@@ -233,7 +231,6 @@ function App() {
       const res = await api.get("/products/meta");
       setCategories(res.data.categories || []);
       setBrands(res.data.brands || []);
-      setCollections(res.data.collections || []);
       setColors(res.data.colors || []);
       setSizes(res.data.sizes || []);
     } catch {
@@ -263,7 +260,6 @@ function App() {
     api.get("/products/meta").then((res) => {
       setCategories(res.data.categories || []);
       setBrands(res.data.brands || []);
-      setCollections(res.data.collections || []);
       setColors(res.data.colors || []);
       setSizes(res.data.sizes || []);
     });
@@ -391,27 +387,6 @@ function App() {
       addressLine: u.addressLine || u.address || "",
     }));
   }, [authState.user]);
-
-  const displayedProducts = useMemo(() => {
-    let list = [...products];
-    const min = Number(filters.minPrice || 0);
-    const max = Number(filters.maxPrice || 0);
-
-    if (filters.minPrice) {
-      list = list.filter((p) => p.pricePkr >= min);
-    }
-    if (filters.maxPrice) {
-      list = list.filter((p) => p.pricePkr <= max);
-    }
-    if (filters.sortBy === "price_low") {
-      list.sort((a, b) => a.pricePkr - b.pricePkr);
-    } else if (filters.sortBy === "price_high") {
-      list.sort((a, b) => b.pricePkr - a.pricePkr);
-    } else if (filters.sortBy === "newest") {
-      list.sort((a, b) => b.id - a.id);
-    }
-    return list;
-  }, [products, filters.minPrice, filters.maxPrice, filters.sortBy]);
 
   function addToCart(product: Product) {
     setCartItems((prev) => {
@@ -582,13 +557,12 @@ function App() {
               filters={filters}
               setFilters={setFilters}
               brands={brands}
-              collections={collections}
               colors={colors}
               sizes={sizes}
               categories={categories}
               itemsPerPage={itemsPerPage}
               loading={loading}
-              products={displayedProducts}
+              products={products}
               addedMap={addedMap}
               currentPage={cursorTrail.length}
               totalPages={totalPagesFromCount}
@@ -655,20 +629,6 @@ function App() {
                   return;
                 }
                 navigate("/checkout");
-              }}
-            />
-          }
-        />
-        <Route
-          path="/collections"
-          element={
-            <CollectionsPage
-              collections={collections}
-              onStartShopping={(collection) => {
-                const nextFilters = { ...filters, collection: collection || "" };
-                setFilters(nextFilters);
-                loadProductsAtTrail([null], itemsPerPage, nextFilters);
-                navigate("/");
               }}
             />
           }

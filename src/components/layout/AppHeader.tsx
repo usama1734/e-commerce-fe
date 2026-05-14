@@ -43,9 +43,6 @@ export function AppHeader({ authState, cartItems, onLogout }: AppHeaderProps) {
       <Link to="/" onClick={onClose}>
         <Text {...getNavTextProps("/")}>Home</Text>
       </Link>
-      <Link to="/collections" onClick={onClose}>
-        <Text {...getNavTextProps("/collections")}>Collections</Text>
-      </Link>
       {authState.user ? (
         <Link to="/orders" onClick={onClose}>
           <Text

@@ -38,18 +38,12 @@ export default defineConfig(({ mode, command }) => {
       },
     },
     server: {
-      host: true,
-      allowedHosts: true,
       proxy: {
         '/api': {
           target: proxyTarget,
           changeOrigin: true,
         },
       },
-    },
-    preview: {
-      host: true,
-      allowedHosts: true,
     },
   };
 });

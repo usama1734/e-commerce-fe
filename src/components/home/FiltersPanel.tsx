@@ -6,7 +6,6 @@ type FiltersPanelProps = {
   filters: Filters;
   setFilters: SetFilters;
   brands: string[];
-  collections: string[];
   colors: string[];
   sizes: string[];
   onApply: () => void;
@@ -17,7 +16,6 @@ export function FiltersPanel({
   filters,
   setFilters,
   brands,
-  collections,
   colors,
   sizes,
   onApply,
@@ -95,22 +93,6 @@ export function FiltersPanel({
         </VStack>
         <VStack align="stretch" spacing="1">
           <Text fontSize="xs" color="gray.500" fontWeight="600">
-            Collection
-          </Text>
-          <Select
-            value={filters.collection}
-            onChange={(e) => setFilters((p) => ({ ...p, collection: e.target.value }))}
-          >
-            <option value="">All Collections</option>
-            {collections.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </Select>
-        </VStack>
-        <VStack align="stretch" spacing="1">
-          <Text fontSize="xs" color="gray.500" fontWeight="600">
             Price Min
           </Text>
           <Input
@@ -138,7 +120,7 @@ export function FiltersPanel({
             onChange={(e) =>
               setFilters((p) => ({
                 ...p,
-                sortBy: e.target.value as "featured" | "price_low" | "price_high" | "newest",
+                sortBy: e.target.value as Filters["sortBy"],
               }))
             }
           >
@@ -146,6 +128,8 @@ export function FiltersPanel({
             <option value="price_low">Price: Low to High</option>
             <option value="price_high">Price: High to Low</option>
             <option value="newest">Newest</option>
+            <option value="most_sold">Best sellers</option>
+            <option value="biggest_discount">Biggest discounts</option>
           </Select>
         </VStack>
       </SimpleGrid>

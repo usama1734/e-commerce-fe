@@ -14,7 +14,6 @@ type HomePageProps = {
   filters: Filters;
   setFilters: SetFilters;
   brands: string[];
-  collections: string[];
   colors: string[];
   sizes: string[];
   categories: string[];
@@ -45,7 +44,6 @@ export function HomePage(props: HomePageProps) {
     filters,
     setFilters,
     brands,
-    collections,
     colors,
     sizes,
     categories,
@@ -74,7 +72,6 @@ export function HomePage(props: HomePageProps) {
         filters={filters}
         setFilters={setFilters}
         brands={brands}
-        collections={collections}
         colors={colors}
         sizes={sizes}
         onApply={onApplyFilters}
