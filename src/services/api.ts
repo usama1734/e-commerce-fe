@@ -19,6 +19,16 @@ function readStoredAuth(): { user?: unknown; accessToken?: string; refreshToken?
   }
 }
 
+const apiBase =
+  typeof import.meta.env.VITE_API_BASE_URL === "string" && import.meta.env.VITE_API_BASE_URL.length > 0
+    ? import.meta.env.VITE_API_BASE_URL
+    : "/api";
+
+function authRefreshUrl(): string {
+  const base = apiBase.endsWith("/") ? apiBase.slice(0, -1) : apiBase;
+  return `${base}/auth/refresh`;
+}
+
 /**
  * Uses fetch (not `api`) to avoid interceptor recursion.
  * @returns true if new tokens were written to localStorage
@@ -28,7 +38,7 @@ async function trySilentRefresh(): Promise<boolean> {
   const refreshToken = stored?.refreshToken;
   if (!refreshToken || typeof refreshToken !== "string") return false;
 
-  const res = await fetch("/api/auth/refresh", {
+  const res = await fetch(authRefreshUrl(), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ refreshToken }),
@@ -53,7 +63,7 @@ async function trySilentRefresh(): Promise<boolean> {
 }
 
 export const api = axios.create({
-  baseURL: "/api",
+  baseURL: apiBase,
 });
 
 api.interceptors.response.use(
