@@ -2,6 +2,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
+import { resolvePublicApiBase } from './vite.resolveApiBase.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -10,20 +11,26 @@ export default defineConfig(({ mode, command }) => {
   const env = loadEnv(mode, __dirname, '');
   const proxyTarget = env.VITE_API_PROXY_TARGET || 'http://127.0.0.1:4000';
 
-  const apiBaseForClient = (env.VITE_API_BASE_URL || '').trim();
+  /** Injected into the client bundle — see src/config/apiBase.ts */
+  const publicApiBase = resolvePublicApiBase(env);
+
   if (command === 'build' && mode === 'production' && process.env.VERCEL === '1') {
-    if (!/^https:\/\//i.test(apiBaseForClient)) {
+    const ok = publicApiBase && !publicApiBase.startsWith('/') && /^https:\/\//i.test(publicApiBase);
+    if (!ok) {
       // eslint-disable-next-line no-console
       console.warn(
-        '\n[Vite] Vercel production build: VITE_API_BASE_URL should be an absolute https:// URL to your API (e.g. https://xxx.up.railway.app/api).\n' +
-          '        If it is missing or relative (/api), the deployed app will call your Vercel domain, not the backend.\n' +
-          '        Set it in Vercel → Settings → Environment Variables, then redeploy.\n'
+        '\n[Vite] Vercel production build: set an absolute API URL so the app does not call itself.\n' +
+          '        Use one of (then redeploy): VITE_API_BASE_URL, VITE_BACKEND_URL, BACKEND_URL, BACKEND_PUBLIC_URL\n' +
+          '        Example: https://your-api.up.railway.app or https://your-api.up.railway.app/api\n'
       );
     }
   }
 
   return {
     envDir: __dirname,
+    define: {
+      __APP_API_BASE__: JSON.stringify(publicApiBase),
+    },
     plugins: [react()],
     resolve: {
       alias: {
